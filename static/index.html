@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>💑 Our Expenses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ── RESET & TOKENS ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f4f1ee;
+    --card:      #ffffff;
+    --border:    #e8e3dc;
+
+    --indigo:    #5b5bd6;
+    --indigo-lt: #ededfb;
+    --pink:      #e05c8a;
+    --pink-lt:   #fde8f1;
+
+    --text:      #1a1a2e;
+    --muted:     #8a8799;
+    --success:   #2e9e6b;
+
+    --shadow:    0 2px 16px rgba(0,0,0,.07);
+    --radius:    18px;
+    --radius-sm: 10px;
+
+    --u1: var(--indigo);
+    --u1-lt: var(--indigo-lt);
+    --u2: var(--pink);
+    --u2-lt: var(--pink-lt);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── TOPBAR ─────────────────────────────────────────────── */
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .topbar h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--text);
+  }
+  .topbar h1 span { color: var(--pink); }
+
+  /* countdown pill */
+  #countdown-pill {
+    background: linear-gradient(135deg, var(--indigo-lt), var(--pink-lt));
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ─────────────────────────────────────────────── */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 14px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  @media (min-width: 700px) {
+    .main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+
+  /* ── USER SECTION ───────────────────────────────────────── */
+  .user-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* profile card */
+  .profile-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px 20px 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-top: 4px solid var(--accent);
+  }
+  .user-section[data-user="user1"] .profile-card { --accent: var(--u1); }
+  .user-section[data-user="user2"] .profile-card { --accent: var(--u2); }
+
+  .avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .profile-total {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .profile-label { font-size: .72rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* ── SECTION BLOCK (expenses / debts) ──────────────────── */
+  .block {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+  }
+  .add-btn {
+    background: var(--accent-lt);
+    color: var(--accent);
+    border: none;
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .add-btn:hover { filter: brightness(.93); }
+  .user-section[data-user="user1"] .add-btn { --accent: var(--u1); --accent-lt: var(--u1-lt); }
+  .user-section[data-user="user2"] .add-btn { --accent: var(--u2); --accent-lt: var(--u2-lt); }
+
+  /* list */
+  .item-list { padding: 6px 0; min-height: 42px; }
+  .empty-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: .82rem;
+    padding: 18px 10px;
+  }
+
+  /* expense row */
+  .exp-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 18px;
+    gap: 12px;
+    border-bottom: 1px solid #f5f3f0;
+    animation: fadeIn .25s ease;
+  }
+  .exp-row:last-child { border-bottom: none; }
+  .exp-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .user-section[data-user="user1"] .exp-dot { --accent: var(--u1); }
+  .user-section[data-user="user2"] .exp-dot { --accent: var(--u2); }
+  .exp-info { flex: 1; min-width: 0; }
+  .exp-title {
+    font-weight: 500;
+    font-size: .92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .exp-date { font-size: .73rem; color: var(--muted); margin-top: 1px; }
+  .exp-amount { font-weight: 600; font-size: .97rem; color: var(--text); white-space: nowrap; }
+  .del-btn {
+    background: none; border: none; cursor: pointer;
+    color: #ccc; font-size: 1rem; padding: 0 2px;
+    transition: color .15s;
+    line-height: 1;
+  }
+  .del-btn:hover { color: #e05c5c; }
+
+  /* debt row */
+  .debt-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 18px;
+    gap: 12px;
+    border-bottom: 1px solid #f5f3f0;
+    animation: fadeIn .25s ease;
+  }
+  .debt-row:last-child { border-bottom: none; }
+  .debt-info { flex: 1; min-width: 0; }
+  .debt-person { font-weight: 600; font-size: .9rem; }
+  .debt-note { font-size: .73rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .debt-amt { font-weight: 600; font-size: .95rem; color: var(--pink); white-space: nowrap; }
+  .pay-btn {
+    background: #e8f9f1;
+    color: var(--success);
+    border: none;
+    border-radius: 99px;
+    padding: 5px 12px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .pay-btn:hover { background: #d1f5e4; }
+  .pay-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── MODAL ───────────────────────────────────────────────── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(20,18,40,.45);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn .18s ease;
+  }
+  @media (min-width: 600px) {
+    .modal-backdrop { align-items: center; }
+  }
+  .modal {
+    background: var(--card);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 28px 22px 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,.12);
+    animation: slideUp .22s ease;
+  }
+  @media (min-width: 600px) {
+    .modal { border-radius: var(--radius); animation: fadeIn .18s ease; }
+  }
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: .95rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color .15s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--modal-accent, var(--indigo));
+  }
+  .form-group textarea { resize: none; height: 70px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1;
+    background: var(--modal-accent, var(--indigo));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── TOAST ──────────────────────────────────────────────── */
+  #toast {
+    position: fixed;
+    bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-size: .88rem;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform .3s ease, opacity .3s;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ── LOADER ─────────────────────────────────────────────── */
+  .skeleton {
+    background: linear-gradient(90deg, #ece9e4 25%, #f5f3f0 50%, #ece9e4 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 8px;
+    height: 14px;
+    margin: 8px 18px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <h1>Our <span>Expenses</span></h1>
+  <div id="countdown-pill">Loading...</div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+  <!-- User 1 -->
+  <div class="user-section" data-user="user1" id="section-user1">
+    <div class="profile-card">
+      <img class="avatar" id="avatar-user1" src="" alt="User 1" />
+      <div class="profile-info">
+        <div class="profile-name" id="name-user1">—</div>
+        <div class="profile-label">Total Spent</div>
+        <div class="profile-total" id="total-user1">₹0</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">💳 Expenses</span>
+        <button class="add-btn" onclick="openModal('expense','user1')">+ Add</button>
+      </div>
+      <div class="item-list" id="expenses-user1">
+        <div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">💸 Debts</span>
+        <button class="add-btn" onclick="openModal('debt','user1')">+ Add</button>
+      </div>
+      <div class="item-list" id="debts-user1">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User 2 -->
+  <div class="user-section" data-user="user2" id="section-user2">
+    <div class="profile-card">
+      <img class="avatar" id="avatar-user2" src="" alt="User 2" />
+      <div class="profile-info">
+        <div class="profile-name" id="name-user2">—</div>
+        <div class="profile-label">Total Spent</div>
+        <div class="profile-total" id="total-user2">₹0</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">💳 Expenses</span>
+        <button class="add-btn" onclick="openModal('expense','user2')">+ Add</button>
+      </div>
+      <div class="item-list" id="expenses-user2">
+        <div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">💸 Debts</span>
+        <button class="add-btn" onclick="openModal('debt','user2')">+ Add</button>
+      </div>
+      <div class="item-list" id="debts-user2">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <h3 id="modal-title">Add Expense</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="modal-submit" onclick="submitModal()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const API = "";  // same origin; Flask serves both
+
+// ── STATE ───────────────────────────────────────────────
+let modalType = null;  // 'expense' | 'debt'
+let modalUser = null;  // 'user1' | 'user2'
+let users     = {};    // { user1: {...}, user2: {...} }
+
+// ── HELPERS ─────────────────────────────────────────────
+const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
+const fmtDate = (iso) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const toast = (msg, ms = 2400) => {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), ms);
+};
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { "Content-Type": "application/json" },
+    ...opts,
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error || "Request failed");
+  }
+  return res.json();
+}
+
+// ── COUNTDOWN ───────────────────────────────────────────
+// 🔧 EDIT THIS DATE to your anniversary / special date
+const SPECIAL_DATE = new Date("2024-02-14T00:00:00");
+
+function updateCountdown() {
+  const now  = new Date();
+  const diff = now - SPECIAL_DATE;
+  const days = Math.floor(diff / 86400000);
+  document.getElementById("countdown-pill").textContent = `💑 ${days} days together`;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ── RENDER ──────────────────────────────────────────────
+function renderExpenses(userId, list) {
+  const el = document.getElementById(`expenses-${userId}`);
+  if (!list.length) {
+    el.innerHTML = `<p class="empty-msg">No expenses yet ✨</p>`;
+    return;
+  }
+  el.innerHTML = list.map(e => `
+    <div class="exp-row" id="exp-${e.id}">
+      <div class="exp-dot"></div>
+      <div class="exp-info">
+        <div class="exp-title">${esc(e.title)}</div>
+        <div class="exp-date">${fmtDate(e.created_at)}</div>
+      </div>
+      <div class="exp-amount">${fmt(e.amount)}</div>
+      <button class="del-btn" title="Delete" onclick="deleteExpense('${e.id}','${userId}')">✕</button>
+    </div>
+  `).join("");
+}
+
+function renderDebts(userId, list) {
+  const el = document.getElementById(`debts-${userId}`);
+  if (!list.length) {
+    el.innerHTML = `<p class="empty-msg">No pending debts 🎉</p>`;
+    return;
+  }
+  el.innerHTML = list.map(d => `
+    <div class="debt-row" id="debt-${d.id}">
+      <div class="debt-info">
+        <div class="debt-person">👤 ${esc(d.person)}</div>
+        ${d.note ? `<div class="debt-note">${esc(d.note)}</div>` : ""}
+        <div class="debt-note">${fmtDate(d.created_at)}</div>
+      </div>
+      <div class="debt-amt">${fmt(d.amount)}</div>
+      <button class="pay-btn" id="pay-${d.id}" onclick="markPaid('${d.id}','${userId}')">✓ Paid</button>
+    </div>
+  `).join("");
+}
+
+function updateTotal(userId, expenses) {
+  const total = expenses.reduce((s, e) => s + e.amount, 0);
+  document.getElementById(`total-${userId}`).textContent = fmt(total);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ── LOAD DATA ───────────────────────────────────────────
+async function loadAll() {
+  try {
+    // Users
+    const usersArr = await api("/api/users");
+    usersArr.forEach(u => { users[u.id] = u; });
+
+    ["user1", "user2"].forEach(uid => {
+      const u = users[uid];
+      if (!u) return;
+      document.getElementById(`name-${uid}`).textContent = u.name;
+      const img = document.getElementById(`avatar-${uid}`);
+      img.src = u.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${uid}`;
+      img.onerror = () => { img.src = `https://api.dicebear.com/7.x/notionists/svg?seed=${uid}`; };
+    });
+
+    // Expenses + Debts (parallel)
+    await Promise.all(["user1", "user2"].map(async uid => {
+      const [exps, debts] = await Promise.all([
+        api(`/api/expenses?user_id=${uid}`),
+        api(`/api/debts?user_id=${uid}`),
+      ]);
+      renderExpenses(uid, exps);
+      renderDebts(uid, debts);
+      updateTotal(uid, exps);
+    }));
+  } catch (err) {
+    console.error(err);
+    toast("⚠️ Failed to load data");
+  }
+}
+
+// ── MODAL ───────────────────────────────────────────────
+function openModal(type, userId) {
+  modalType = type;
+  modalUser = userId;
+  const accent = userId === "user1" ? "var(--u1)" : "var(--u2)";
+  document.getElementById("modal-box").style.setProperty("--modal-accent", accent);
+
+  if (type === "expense") {
+    document.getElementById("modal-title").textContent = "Add Expense";
+    document.getElementById("modal-body").innerHTML = `
+      <div class="form-group">
+        <label>Title</label>
+        <input id="f-title" type="text" placeholder="e.g. Lunch, Shoes…" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input id="f-amount" type="number" placeholder="0" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="f-date" type="date" value="${todayISO()}" />
+      </div>
+    `;
+  } else {
+    document.getElementById("modal-title").textContent = "Add Debt";
+    document.getElementById("modal-body").innerHTML = `
+      <div class="form-group">
+        <label>Person</label>
+        <input id="f-person" type="text" placeholder="Who do you owe?" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input id="f-amount" type="number" placeholder="0" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Note (optional)</label>
+        <textarea id="f-note" placeholder="What's it for?"></textarea>
+      </div>
+    `;
+  }
+
+  document.getElementById("modal-backdrop").style.display = "flex";
+  setTimeout(() => document.querySelector("#modal-body input")?.focus(), 100);
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById("modal-backdrop")) return;
+  document.getElementById("modal-backdrop").style.display = "none";
+}
+
+async function submitModal() {
+  const btn = document.getElementById("modal-submit");
+  btn.disabled = true;
+
+  try {
+    if (modalType === "expense") {
+      const title  = document.getElementById("f-title")?.value.trim();
+      const amount = parseFloat(document.getElementById("f-amount")?.value);
+      const date   = document.getElementById("f-date")?.value;
+
+      if (!title) throw new Error("Please enter a title");
+      if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
+
+      const created_at = date ? new Date(date).toISOString() : new Date().toISOString();
+      await api("/api/expenses", {
+        method: "POST",
+        body: JSON.stringify({ title, amount, user_id: modalUser, created_at }),
+      });
+      toast("✅ Expense added!");
+
+    } else {
+      const person = document.getElementById("f-person")?.value.trim();
+      const amount = parseFloat(document.getElementById("f-amount")?.value);
+      const note   = document.getElementById("f-note")?.value.trim();
+
+      if (!person) throw new Error("Please enter a person name");
+      if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
+
+      await api("/api/debts", {
+        method: "POST",
+        body: JSON.stringify({ person, amount, note, user_id: modalUser }),
+      });
+      toast("✅ Debt added!");
+    }
+
+    document.getElementById("modal-backdrop").style.display = "none";
+    await loadAll();
+
+  } catch (err) {
+    toast("⚠️ " + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── ACTIONS ─────────────────────────────────────────────
+async function deleteExpense(id, userId) {
+  if (!confirm("Delete this expense?")) return;
+  try {
+    await api(`/api/expenses/${id}`, { method: "DELETE" });
+    toast("🗑 Deleted");
+    await loadAll();
+  } catch (err) {
+    toast("⚠️ " + err.message);
+  }
+}
+
+async function markPaid(debtId, userId) {
+  const btn = document.getElementById(`pay-${debtId}`);
+  if (btn) btn.disabled = true;
+  try {
+    await api(`/api/debts/${debtId}/pay`, { method: "POST" });
+    toast("🎉 Marked paid & added to expenses!");
+    await loadAll();
+  } catch (err) {
+    toast("⚠️ " + err.message);
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ── UTILS ───────────────────────────────────────────────
+function todayISO() {
+  return new Date().toISOString().split("T")[0];
+}
+
+// keyboard shortcut: Escape to close modal
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.getElementById("modal-backdrop").style.display = "none";
+  }
+});
+
+// ── INIT ────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
