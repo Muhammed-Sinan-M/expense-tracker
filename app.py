@@ -76,6 +76,51 @@ def delete_expense(expense_id):
     return jsonify({"message": "Deleted"}), 200
 
 
+# ─── RECEIVABLES ──────────────────────────────────────────────────────────────
+@app.route("/api/receivables", methods=["GET"])
+def get_receivables():
+    user_id = request.args.get("user_id")
+    query = (
+        supabase.table("receivables")
+        .select("*")
+        .order("created_at", desc=True)
+    )
+    if user_id:
+        query = query.eq("user_id", user_id)
+    res = query.execute()
+    return jsonify(res.data)
+
+
+@app.route("/api/receivables", methods=["POST"])
+def add_receivable():
+    body = request.get_json()
+    required = ("person", "amount", "user_id")
+    if not all(k in body for k in required):
+        return jsonify({"error": "Missing required fields: person, amount, user_id"}), 400
+    try:
+        amount = float(body["amount"])
+        if amount <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a positive number"}), 400
+
+    payload = {
+        "person": str(body["person"]).strip(),
+        "amount": amount,
+        "note": str(body.get("note", "")).strip() or None,
+        "user_id": body["user_id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    res = supabase.table("receivables").insert(payload).execute()
+    return jsonify(res.data[0]), 201
+
+
+@app.route("/api/receivables/<receivable_id>", methods=["DELETE"])
+def delete_receivable(receivable_id):
+    supabase.table("receivables").delete().eq("id", receivable_id).execute()
+    return jsonify({"message": "Deleted"}), 200
+
+
 # ─── DEBTS ────────────────────────────────────────────────────────────────────
 @app.route("/api/debts", methods=["GET"])
 def get_debts():
@@ -119,7 +164,6 @@ def add_debt():
 
 @app.route("/api/debts/<debt_id>/pay", methods=["POST"])
 def mark_debt_paid(debt_id):
-    """Mark a debt as paid and auto-create a matching expense."""
     debt_res = supabase.table("debts").select("*").eq("id", debt_id).single().execute()
     debt = debt_res.data
 
@@ -128,10 +172,8 @@ def mark_debt_paid(debt_id):
     if debt["status"] == "paid":
         return jsonify({"error": "Debt already marked as paid"}), 400
 
-    # Mark debt paid
     supabase.table("debts").update({"status": "paid"}).eq("id", debt_id).execute()
 
-    # Auto-create expense
     expense_payload = {
         "title": f"Paid {debt['person']}",
         "amount": debt["amount"],
@@ -152,19 +194,23 @@ def delete_debt(debt_id):
 # ─── SUMMARY ──────────────────────────────────────────────────────────────────
 @app.route("/api/summary", methods=["GET"])
 def get_summary():
-    """Return totals for both users in one call."""
     exp_res = supabase.table("expenses").select("user_id, amount").execute()
     debt_res = supabase.table("debts").select("user_id, amount").eq("status", "pending").execute()
+    recv_res = supabase.table("receivables").select("user_id, amount").execute()
 
     totals = {}
     for row in exp_res.data:
         uid = row["user_id"]
-        totals.setdefault(uid, {"expense_total": 0, "debt_total": 0})
+        totals.setdefault(uid, {"expense_total": 0, "debt_total": 0, "receivable_total": 0})
         totals[uid]["expense_total"] += row["amount"]
     for row in debt_res.data:
         uid = row["user_id"]
-        totals.setdefault(uid, {"expense_total": 0, "debt_total": 0})
+        totals.setdefault(uid, {"expense_total": 0, "debt_total": 0, "receivable_total": 0})
         totals[uid]["debt_total"] += row["amount"]
+    for row in recv_res.data:
+        uid = row["user_id"]
+        totals.setdefault(uid, {"expense_total": 0, "debt_total": 0, "receivable_total": 0})
+        totals[uid]["receivable_total"] += row["amount"]
 
     return jsonify(totals)
 
