@@ -7,27 +7,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  /* ── RESET & TOKENS ─────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg:        #f4f1ee;
     --card:      #ffffff;
     --border:    #e8e3dc;
-
     --indigo:    #5b5bd6;
     --indigo-lt: #ededfb;
     --pink:      #e05c8a;
     --pink-lt:   #fde8f1;
-
     --text:      #1a1a2e;
     --muted:     #8a8799;
     --success:   #2e9e6b;
-
+    --danger:    #e05c5c;
+    --teal:      #2b9e8e;
+    --teal-lt:   #e0f5f3;
     --shadow:    0 2px 16px rgba(0,0,0,.07);
     --radius:    18px;
     --radius-sm: 10px;
-
     --u1: var(--indigo);
     --u1-lt: var(--indigo-lt);
     --u2: var(--pink);
@@ -62,16 +60,20 @@
   }
   .topbar h1 span { color: var(--pink); }
 
-  /* countdown pill */
-  #countdown-pill {
-    background: linear-gradient(135deg, var(--indigo-lt), var(--pink-lt));
-    border: 1px solid var(--border);
-    border-radius: 99px;
-    padding: 6px 14px;
-    font-size: .75rem;
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
+  /* ── JUNE BANNER ────────────────────────────────────────── */
+  .june-banner {
+    background: linear-gradient(135deg, #fff8f0 0%, #fde8f1 100%);
+    border-bottom: 1px solid #f0dde8;
+    padding: 8px 20px;
+    text-align: center;
+    font-size: .78rem;
+    color: var(--muted);
+  }
+  .june-banner strong {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--pink);
+    margin: 0 3px;
   }
 
   /* ── LAYOUT ─────────────────────────────────────────────── */
@@ -83,55 +85,56 @@
     grid-template-columns: 1fr;
     gap: 22px;
   }
-
   @media (min-width: 700px) {
     .main { grid-template-columns: 1fr 1fr; gap: 28px; }
   }
 
   /* ── USER SECTION ───────────────────────────────────────── */
-  .user-section {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
+  .user-section { display: flex; flex-direction: column; gap: 14px; }
 
-  /* profile card */
+  /* ── PROFILE CARD ───────────────────────────────────────── */
   .profile-card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 22px 20px 18px;
+    padding: 20px 20px 16px;
     box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 16px;
     border-top: 4px solid var(--accent);
   }
   .user-section[data-user="user1"] .profile-card { --accent: var(--u1); }
   .user-section[data-user="user2"] .profile-card { --accent: var(--u2); }
 
+  .profile-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
   .avatar {
-    width: 60px; height: 60px;
+    width: 56px; height: 56px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--accent);
     flex-shrink: 0;
   }
-  .profile-info { flex: 1; min-width: 0; }
   .profile-name {
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--text);
   }
-  .profile-total {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--accent);
-    margin-top: 2px;
-  }
-  .profile-label { font-size: .72rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
 
-  /* ── SECTION BLOCK (expenses / debts) ──────────────────── */
+  /* expense total sub-line */
+  .exp-total-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 2px 0;
+    font-size: .76rem;
+    color: var(--muted);
+  }
+  .exp-total-line span { font-weight: 600; color: var(--text); }
+
+  /* ── BLOCK ───────────────────────────────────────────────── */
   .block {
     background: var(--card);
     border-radius: var(--radius);
@@ -142,11 +145,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px 10px;
+    padding: 13px 18px 9px;
     border-bottom: 1px solid var(--border);
   }
   .block-title {
-    font-size: .8rem;
+    font-size: .78rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .06em;
@@ -157,88 +160,81 @@
     color: var(--accent);
     border: none;
     border-radius: 99px;
-    padding: 6px 14px;
-    font-size: .8rem;
+    padding: 5px 13px;
+    font-size: .78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background .15s;
+    transition: filter .15s;
     font-family: 'DM Sans', sans-serif;
   }
-  .add-btn:hover { filter: brightness(.93); }
+  .add-btn:hover { filter: brightness(.92); }
   .user-section[data-user="user1"] .add-btn { --accent: var(--u1); --accent-lt: var(--u1-lt); }
   .user-section[data-user="user2"] .add-btn { --accent: var(--u2); --accent-lt: var(--u2-lt); }
 
-  /* list */
-  .item-list { padding: 6px 0; min-height: 42px; }
+  .item-list { padding: 4px 0; min-height: 40px; }
   .empty-msg {
     text-align: center;
     color: var(--muted);
     font-size: .82rem;
-    padding: 18px 10px;
+    padding: 16px 10px;
   }
 
   /* expense row */
   .exp-row {
-    display: flex;
-    align-items: center;
-    padding: 11px 18px;
-    gap: 12px;
+    display: flex; align-items: center;
+    padding: 10px 18px; gap: 12px;
     border-bottom: 1px solid #f5f3f0;
-    animation: fadeIn .25s ease;
+    animation: fadeIn .22s ease;
   }
   .exp-row:last-child { border-bottom: none; }
   .exp-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    flex-shrink: 0;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
   }
   .user-section[data-user="user1"] .exp-dot { --accent: var(--u1); }
   .user-section[data-user="user2"] .exp-dot { --accent: var(--u2); }
   .exp-info { flex: 1; min-width: 0; }
-  .exp-title {
-    font-weight: 500;
-    font-size: .92rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .exp-date { font-size: .73rem; color: var(--muted); margin-top: 1px; }
-  .exp-amount { font-weight: 600; font-size: .97rem; color: var(--text); white-space: nowrap; }
+  .exp-title { font-weight: 500; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .exp-date { font-size: .7rem; color: var(--muted); margin-top: 1px; }
+  .exp-amount { font-weight: 600; font-size: .95rem; white-space: nowrap; }
   .del-btn {
     background: none; border: none; cursor: pointer;
-    color: #ccc; font-size: 1rem; padding: 0 2px;
-    transition: color .15s;
-    line-height: 1;
+    color: #ccc; font-size: .95rem; padding: 0 2px;
+    transition: color .15s; line-height: 1;
   }
-  .del-btn:hover { color: #e05c5c; }
+  .del-btn:hover { color: var(--danger); }
+
+  /* receivable row */
+  .recv-row {
+    display: flex; align-items: center;
+    padding: 10px 18px; gap: 12px;
+    border-bottom: 1px solid #f5f3f0;
+    animation: fadeIn .22s ease;
+  }
+  .recv-row:last-child { border-bottom: none; }
+  .recv-info { flex: 1; min-width: 0; }
+  .recv-person { font-weight: 600; font-size: .88rem; }
+  .recv-note { font-size: .7rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .recv-amt { font-weight: 600; font-size: .93rem; color: var(--teal); white-space: nowrap; }
 
   /* debt row */
   .debt-row {
-    display: flex;
-    align-items: center;
-    padding: 11px 18px;
-    gap: 12px;
+    display: flex; align-items: center;
+    padding: 10px 18px; gap: 12px;
     border-bottom: 1px solid #f5f3f0;
-    animation: fadeIn .25s ease;
+    animation: fadeIn .22s ease;
   }
   .debt-row:last-child { border-bottom: none; }
   .debt-info { flex: 1; min-width: 0; }
-  .debt-person { font-weight: 600; font-size: .9rem; }
-  .debt-note { font-size: .73rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .debt-amt { font-weight: 600; font-size: .95rem; color: var(--pink); white-space: nowrap; }
+  .debt-person { font-weight: 600; font-size: .88rem; }
+  .debt-note { font-size: .7rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .debt-amt { font-weight: 600; font-size: .93rem; color: var(--pink); white-space: nowrap; }
   .pay-btn {
-    background: #e8f9f1;
-    color: var(--success);
-    border: none;
-    border-radius: 99px;
-    padding: 5px 12px;
-    font-size: .75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background .15s;
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
+    background: #e8f9f1; color: var(--success);
+    border: none; border-radius: 99px;
+    padding: 5px 11px; font-size: .73rem; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
   }
   .pay-btn:hover { background: #d1f5e4; }
   .pay-btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -249,113 +245,73 @@
     background: rgba(20,18,40,.45);
     backdrop-filter: blur(4px);
     z-index: 200;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    display: flex; align-items: flex-end; justify-content: center;
     animation: fadeIn .18s ease;
   }
-  @media (min-width: 600px) {
-    .modal-backdrop { align-items: center; }
-  }
+  @media (min-width: 600px) { .modal-backdrop { align-items: center; } }
   .modal {
     background: var(--card);
     border-radius: var(--radius) var(--radius) 0 0;
-    padding: 28px 22px 32px;
-    width: 100%;
-    max-width: 420px;
+    padding: 26px 22px 32px;
+    width: 100%; max-width: 420px;
     box-shadow: 0 -8px 40px rgba(0,0,0,.12);
     animation: slideUp .22s ease;
   }
-  @media (min-width: 600px) {
-    .modal { border-radius: var(--radius); animation: fadeIn .18s ease; }
-  }
-  .modal h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-  }
-  .form-group { margin-bottom: 14px; }
+  @media (min-width: 600px) { .modal { border-radius: var(--radius); animation: fadeIn .18s ease; } }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 18px; }
+  .form-group { margin-bottom: 13px; }
   .form-group label {
-    display: block;
-    font-size: .78rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: 6px;
+    display: block; font-size: .75rem; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 5px;
   }
   .form-group input, .form-group textarea {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: .95rem;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    transition: border-color .15s;
-    outline: none;
+    width: 100%; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    font-size: .95rem; font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    transition: border-color .15s; outline: none;
   }
-  .form-group input:focus, .form-group textarea:focus {
-    border-color: var(--modal-accent, var(--indigo));
-  }
-  .form-group textarea { resize: none; height: 70px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--modal-accent, var(--indigo)); }
+  .form-group textarea { resize: none; height: 68px; }
+  .form-hint { font-size: .74rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
   .btn-primary {
-    flex: 1;
-    background: var(--modal-accent, var(--indigo));
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 12px;
-    font-size: .95rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: opacity .15s;
+    flex: 1; background: var(--modal-accent, var(--indigo));
+    color: #fff; border: none; border-radius: var(--radius-sm);
+    padding: 12px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity .15s;
   }
   .btn-primary:hover { opacity: .88; }
   .btn-secondary {
-    background: var(--bg);
-    color: var(--muted);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 18px;
-    font-size: .95rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--muted);
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 18px; font-size: .95rem; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
   }
 
   /* ── TOAST ──────────────────────────────────────────────── */
   #toast {
-    position: fixed;
-    bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-    background: var(--text);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 99px;
-    font-size: .88rem;
-    font-weight: 500;
-    z-index: 999;
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text); color: #fff;
+    padding: 10px 22px; border-radius: 99px;
+    font-size: .86rem; font-weight: 500; z-index: 999;
     transition: transform .3s ease, opacity .3s;
-    opacity: 0;
-    pointer-events: none;
-    white-space: nowrap;
+    opacity: 0; pointer-events: none; white-space: nowrap;
   }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-  /* ── LOADER ─────────────────────────────────────────────── */
+  /* ── SKELETON ───────────────────────────────────────────── */
   .skeleton {
     background: linear-gradient(90deg, #ece9e4 25%, #f5f3f0 50%, #ece9e4 75%);
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite;
-    border-radius: 8px;
-    height: 14px;
-    margin: 8px 18px;
+    border-radius: 8px; height: 13px; margin: 8px 18px;
   }
+
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
 </style>
 </head>
@@ -364,19 +320,28 @@
 <!-- TOPBAR -->
 <div class="topbar">
   <h1>Our <span>Expenses</span></h1>
-  <div id="countdown-pill">Loading...</div>
+</div>
+
+<!-- JUNE COUNTDOWN -->
+<div class="june-banner">
+  🗓 <strong id="june-days">—</strong> days left
 </div>
 
 <!-- MAIN -->
-<div class="main" id="main">
-  <!-- User 1 -->
-  <div class="user-section" data-user="user1" id="section-user1">
+<div class="main">
+
+  <!-- ── USER 1 ── -->
+  <div class="user-section" data-user="user1">
     <div class="profile-card">
-      <img class="avatar" id="avatar-user1" src="" alt="User 1" />
-      <div class="profile-info">
-        <div class="profile-name" id="name-user1">—</div>
-        <div class="profile-label">Total Spent</div>
-        <div class="profile-total" id="total-user1">₹0</div>
+      <div class="profile-top">
+        <img class="avatar" id="avatar-user1" src="" alt="User 1" />
+        <div>
+          <div class="profile-name" id="name-user1">—</div>
+        </div>
+      </div>
+      <div class="exp-total-line">
+        <span style="font-weight:400">Total Expenses</span>
+        <span id="exptotal-user1">₹0</span>
       </div>
     </div>
 
@@ -392,6 +357,16 @@
 
     <div class="block">
       <div class="block-header">
+        <span class="block-title">💰 Money to Get</span>
+        <button class="add-btn" onclick="openModal('receivable','user1')">+ Add</button>
+      </div>
+      <div class="item-list" id="receivables-user1">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
         <span class="block-title">💸 Debts</span>
         <button class="add-btn" onclick="openModal('debt','user1')">+ Add</button>
       </div>
@@ -401,14 +376,18 @@
     </div>
   </div>
 
-  <!-- User 2 -->
-  <div class="user-section" data-user="user2" id="section-user2">
+  <!-- ── USER 2 ── -->
+  <div class="user-section" data-user="user2">
     <div class="profile-card">
-      <img class="avatar" id="avatar-user2" src="" alt="User 2" />
-      <div class="profile-info">
-        <div class="profile-name" id="name-user2">—</div>
-        <div class="profile-label">Total Spent</div>
-        <div class="profile-total" id="total-user2">₹0</div>
+      <div class="profile-top">
+        <img class="avatar" id="avatar-user2" src="" alt="User 2" />
+        <div>
+          <div class="profile-name" id="name-user2">—</div>
+        </div>
+      </div>
+      <div class="exp-total-line">
+        <span style="font-weight:400">Total Expenses</span>
+        <span id="exptotal-user2">₹0</span>
       </div>
     </div>
 
@@ -424,6 +403,16 @@
 
     <div class="block">
       <div class="block-header">
+        <span class="block-title">💰 Money to Get</span>
+        <button class="add-btn" onclick="openModal('receivable','user2')">+ Add</button>
+      </div>
+      <div class="item-list" id="receivables-user2">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-header">
         <span class="block-title">💸 Debts</span>
         <button class="add-btn" onclick="openModal('debt','user2')">+ Add</button>
       </div>
@@ -432,16 +421,17 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- MODAL -->
 <div class="modal-backdrop" id="modal-backdrop" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="modal-box">
-    <h3 id="modal-title">Add Expense</h3>
+    <h3 id="modal-title">Add</h3>
     <div id="modal-body"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" id="modal-submit" onclick="submitModal()">Add</button>
+      <button class="btn-primary" id="modal-submit" onclick="submitModal()">Save</button>
     </div>
   </div>
 </div>
@@ -451,12 +441,12 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const API = "";  // same origin; Flask serves both
+const API = "";
 
 // ── STATE ───────────────────────────────────────────────
-let modalType = null;  // 'expense' | 'debt'
-let modalUser = null;  // 'user1' | 'user2'
-let users     = {};    // { user1: {...}, user2: {...} }
+let modalType = null;   // 'expense' | 'receivable' | 'debt'
+let modalUser = null;
+let users     = {};
 
 // ── HELPERS ─────────────────────────────────────────────
 const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
@@ -485,20 +475,23 @@ async function api(path, opts = {}) {
   return res.json();
 }
 
-// ── COUNTDOWN ───────────────────────────────────────────
-// 🔧 EDIT THIS DATE to your anniversary / special date
-const SPECIAL_DATE = new Date("2024-02-14T00:00:00");
-
-function updateCountdown() {
-  const now  = new Date();
-  const diff = now - SPECIAL_DATE;
-  const days = Math.floor(diff / 86400000);
-  document.getElementById("countdown-pill").textContent = `💑 ${days} days together`;
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
-updateCountdown();
-setInterval(updateCountdown, 60000);
 
-// ── RENDER ──────────────────────────────────────────────
+// ── JUNE COUNTDOWN ──────────────────────────────────────
+function updateJuneCountdown() {
+  const now   = new Date();
+  const year  = now.getFullYear();
+  let june1   = new Date(year, 5, 1);
+  if (now >= june1) june1 = new Date(year + 1, 5, 1);
+  const days  = Math.ceil((june1 - now) / 86400000);
+  document.getElementById("june-days").textContent = days;
+}
+updateJuneCountdown();
+setInterval(updateJuneCountdown, 60000);
+
+// ── RENDER EXPENSES ─────────────────────────────────────
 function renderExpenses(userId, list) {
   const el = document.getElementById(`expenses-${userId}`);
   if (!list.length) {
@@ -518,6 +511,27 @@ function renderExpenses(userId, list) {
   `).join("");
 }
 
+// ── RENDER RECEIVABLES ───────────────────────────────────
+function renderReceivables(userId, list) {
+  const el = document.getElementById(`receivables-${userId}`);
+  if (!list.length) {
+    el.innerHTML = `<p class="empty-msg">Nothing to collect 🙌</p>`;
+    return;
+  }
+  el.innerHTML = list.map(r => `
+    <div class="recv-row" id="recv-${r.id}">
+      <div class="recv-info">
+        <div class="recv-person">👤 ${esc(r.person)}</div>
+        ${r.note ? `<div class="recv-note">${esc(r.note)}</div>` : ""}
+        <div class="recv-note">${fmtDate(r.created_at)}</div>
+      </div>
+      <div class="recv-amt">${fmt(r.amount)}</div>
+      <button class="del-btn" title="Delete" onclick="deleteReceivable('${r.id}','${userId}')">✕</button>
+    </div>
+  `).join("");
+}
+
+// ── RENDER DEBTS ────────────────────────────────────────
 function renderDebts(userId, list) {
   const el = document.getElementById(`debts-${userId}`);
   if (!list.length) {
@@ -537,19 +551,15 @@ function renderDebts(userId, list) {
   `).join("");
 }
 
-function updateTotal(userId, expenses) {
-  const total = expenses.reduce((s, e) => s + e.amount, 0);
-  document.getElementById(`total-${userId}`).textContent = fmt(total);
+// ── UPDATE EXPENSE TOTAL ─────────────────────────────────
+function updateExpTotal(userId, expenses) {
+  const expTotal = expenses.reduce((s, e) => s + e.amount, 0);
+  document.getElementById(`exptotal-${userId}`).textContent = fmt(expTotal);
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-// ── LOAD DATA ───────────────────────────────────────────
+// ── LOAD ALL ────────────────────────────────────────────
 async function loadAll() {
   try {
-    // Users
     const usersArr = await api("/api/users");
     usersArr.forEach(u => { users[u.id] = u; });
 
@@ -562,15 +572,16 @@ async function loadAll() {
       img.onerror = () => { img.src = `https://api.dicebear.com/7.x/notionists/svg?seed=${uid}`; };
     });
 
-    // Expenses + Debts (parallel)
     await Promise.all(["user1", "user2"].map(async uid => {
-      const [exps, debts] = await Promise.all([
+      const [exps, recvs, debts] = await Promise.all([
         api(`/api/expenses?user_id=${uid}`),
+        api(`/api/receivables?user_id=${uid}`),
         api(`/api/debts?user_id=${uid}`),
       ]);
       renderExpenses(uid, exps);
+      renderReceivables(uid, recvs);
       renderDebts(uid, debts);
-      updateTotal(uid, exps);
+      updateExpTotal(uid, exps);
     }));
   } catch (err) {
     console.error(err);
@@ -578,12 +589,13 @@ async function loadAll() {
   }
 }
 
-// ── MODAL ───────────────────────────────────────────────
+// ── OPEN ADD MODAL ──────────────────────────────────────
 function openModal(type, userId) {
   modalType = type;
   modalUser = userId;
   const accent = userId === "user1" ? "var(--u1)" : "var(--u2)";
   document.getElementById("modal-box").style.setProperty("--modal-accent", accent);
+  document.getElementById("modal-submit").textContent = "Add";
 
   if (type === "expense") {
     document.getElementById("modal-title").textContent = "Add Expense";
@@ -599,6 +611,23 @@ function openModal(type, userId) {
       <div class="form-group">
         <label>Date</label>
         <input id="f-date" type="date" value="${todayISO()}" />
+      </div>
+    `;
+  } else if (type === "receivable") {
+    document.getElementById("modal-box").style.setProperty("--modal-accent", "var(--teal)");
+    document.getElementById("modal-title").textContent = "Money to Get";
+    document.getElementById("modal-body").innerHTML = `
+      <div class="form-group">
+        <label>From (Person)</label>
+        <input id="f-person" type="text" placeholder="Who owes you?" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input id="f-amount" type="number" placeholder="0" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Note (optional)</label>
+        <textarea id="f-note" placeholder="What's it for?"></textarea>
       </div>
     `;
   } else {
@@ -623,11 +652,13 @@ function openModal(type, userId) {
   setTimeout(() => document.querySelector("#modal-body input")?.focus(), 100);
 }
 
+// ── CLOSE MODAL ─────────────────────────────────────────
 function closeModal(e) {
   if (e && e.target !== document.getElementById("modal-backdrop")) return;
   document.getElementById("modal-backdrop").style.display = "none";
 }
 
+// ── SUBMIT MODAL ────────────────────────────────────────
 async function submitModal() {
   const btn = document.getElementById("modal-submit");
   btn.disabled = true;
@@ -637,34 +668,45 @@ async function submitModal() {
       const title  = document.getElementById("f-title")?.value.trim();
       const amount = parseFloat(document.getElementById("f-amount")?.value);
       const date   = document.getElementById("f-date")?.value;
-
-      if (!title) throw new Error("Please enter a title");
+      if (!title)                 throw new Error("Please enter a title");
       if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
-
       const created_at = date ? new Date(date).toISOString() : new Date().toISOString();
       await api("/api/expenses", {
         method: "POST",
         body: JSON.stringify({ title, amount, user_id: modalUser, created_at }),
       });
       toast("✅ Expense added!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
+
+    } else if (modalType === "receivable") {
+      const person = document.getElementById("f-person")?.value.trim();
+      const amount = parseFloat(document.getElementById("f-amount")?.value);
+      const note   = document.getElementById("f-note")?.value.trim();
+      if (!person)                throw new Error("Please enter a person name");
+      if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
+      await api("/api/receivables", {
+        method: "POST",
+        body: JSON.stringify({ person, amount, note, user_id: modalUser }),
+      });
+      toast("✅ Added to Money to Get!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
 
     } else {
       const person = document.getElementById("f-person")?.value.trim();
       const amount = parseFloat(document.getElementById("f-amount")?.value);
       const note   = document.getElementById("f-note")?.value.trim();
-
-      if (!person) throw new Error("Please enter a person name");
+      if (!person)                throw new Error("Please enter a person name");
       if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
-
       await api("/api/debts", {
         method: "POST",
         body: JSON.stringify({ person, amount, note, user_id: modalUser }),
       });
       toast("✅ Debt added!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
     }
-
-    document.getElementById("modal-backdrop").style.display = "none";
-    await loadAll();
 
   } catch (err) {
     toast("⚠️ " + err.message);
@@ -673,7 +715,7 @@ async function submitModal() {
   }
 }
 
-// ── ACTIONS ─────────────────────────────────────────────
+// ── DELETE EXPENSE ──────────────────────────────────────
 async function deleteExpense(id, userId) {
   if (!confirm("Delete this expense?")) return;
   try {
@@ -685,6 +727,19 @@ async function deleteExpense(id, userId) {
   }
 }
 
+// ── DELETE RECEIVABLE ────────────────────────────────────
+async function deleteReceivable(id, userId) {
+  if (!confirm("Remove this entry?")) return;
+  try {
+    await api(`/api/receivables/${id}`, { method: "DELETE" });
+    toast("🗑 Removed");
+    await loadAll();
+  } catch (err) {
+    toast("⚠️ " + err.message);
+  }
+}
+
+// ── MARK DEBT PAID ──────────────────────────────────────
 async function markPaid(debtId, userId) {
   const btn = document.getElementById(`pay-${debtId}`);
   if (btn) btn.disabled = true;
@@ -703,11 +758,8 @@ function todayISO() {
   return new Date().toISOString().split("T")[0];
 }
 
-// keyboard shortcut: Escape to close modal
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    document.getElementById("modal-backdrop").style.display = "none";
-  }
+  if (e.key === "Escape") document.getElementById("modal-backdrop").style.display = "none";
 });
 
 // ── INIT ────────────────────────────────────────────────
