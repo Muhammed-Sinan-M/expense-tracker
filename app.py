@@ -14,7 +14,12 @@ SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY: str = os.environ.get("SUPABASE_SERVICE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-
+def adjust_balance(user_id, delta):
+    user_res = supabase.table("users").select("balance").eq("id", user_id).single().execute()
+    current = user_res.data.get("balance", 0) or 0
+    new_balance = current + delta
+    supabase.table("users").update({"balance": new_balance}).eq("id", user_id).execute()
+    return new_balance
 # ─── Serve frontend ────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
@@ -117,8 +122,13 @@ def add_receivable():
 
 @app.route("/api/receivables/<receivable_id>", methods=["DELETE"])
 def delete_receivable(receivable_id):
+    recv_res = supabase.table("receivables").select("*").eq("id", receivable_id).single().execute()
+    recv = recv_res.data
+    if not recv:
+        return jsonify({"error": "Receivable not found"}), 404
     supabase.table("receivables").delete().eq("id", receivable_id).execute()
-    return jsonify({"message": "Deleted"}), 200
+    new_balance = adjust_balance(recv["user_id"], +recv["amount"])
+    return jsonify({"message": "Collected", "new_balance": new_balance}), 200
 
 
 # ─── DEBTS ────────────────────────────────────────────────────────────────────
@@ -181,7 +191,7 @@ def mark_debt_paid(debt_id):
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     exp_res = supabase.table("expenses").insert(expense_payload).execute()
-
+    new_balance = adjust_balance(debt["user_id"], -debt["amount"])
     return jsonify({"message": "Debt paid", "expense": exp_res.data[0]}), 200
 
 
