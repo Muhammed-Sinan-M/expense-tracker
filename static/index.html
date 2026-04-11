@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>💑 Our Expenses</title>
+<title>💑 Nmmmmll</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
@@ -40,7 +40,6 @@
     padding: 0 0 80px;
   }
 
-  /* ── TOPBAR ─────────────────────────────────────────────── */
   .topbar {
     background: var(--card);
     border-bottom: 1px solid var(--border);
@@ -53,14 +52,9 @@
     z-index: 100;
     backdrop-filter: blur(12px);
   }
-  .topbar h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.35rem;
-    color: var(--text);
-  }
+  .topbar h1 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--text); }
   .topbar h1 span { color: var(--pink); }
 
-  /* ── JUNE BANNER ────────────────────────────────────────── */
   .june-banner {
     background: linear-gradient(135deg, #fff8f0 0%, #fde8f1 100%);
     border-bottom: 1px solid #f0dde8;
@@ -76,7 +70,6 @@
     margin: 0 3px;
   }
 
-  /* ── LAYOUT ─────────────────────────────────────────────── */
   .main {
     max-width: 900px;
     margin: 0 auto;
@@ -89,10 +82,8 @@
     .main { grid-template-columns: 1fr 1fr; gap: 28px; }
   }
 
-  /* ── USER SECTION ───────────────────────────────────────── */
   .user-section { display: flex; flex-direction: column; gap: 14px; }
 
-  /* ── PROFILE CARD ───────────────────────────────────────── */
   .profile-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -107,7 +98,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
   .avatar {
     width: 56px; height: 56px;
@@ -123,18 +114,50 @@
     color: var(--text);
   }
 
-  /* expense total sub-line */
-  .exp-total-line {
+  .balance-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 2px 0;
-    font-size: .76rem;
-    color: var(--muted);
+    background: var(--accent-lt);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
   }
-  .exp-total-line span { font-weight: 600; color: var(--text); }
+  .user-section[data-user="user1"] .balance-row { --accent-lt: var(--u1-lt); }
+  .user-section[data-user="user2"] .balance-row { --accent-lt: var(--u2-lt); }
 
-  /* ── BLOCK ───────────────────────────────────────────────── */
+  .balance-label {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .balance-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .balance-amount.negative { color: var(--danger); }
+
+  .set-balance-btn {
+    background: none;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+  }
+  .set-balance-btn:hover { background: var(--accent); color: #fff; }
+
   .block {
     background: var(--card);
     border-radius: var(--radius);
@@ -179,7 +202,6 @@
     padding: 16px 10px;
   }
 
-  /* expense row */
   .exp-row {
     display: flex; align-items: center;
     padding: 10px 18px; gap: 12px;
@@ -204,7 +226,6 @@
   }
   .del-btn:hover { color: var(--danger); }
 
-  /* receivable row */
   .recv-row {
     display: flex; align-items: center;
     padding: 10px 18px; gap: 12px;
@@ -217,7 +238,6 @@
   .recv-note { font-size: .7rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .recv-amt { font-weight: 600; font-size: .93rem; color: var(--teal); white-space: nowrap; }
 
-  /* debt row */
   .debt-row {
     display: flex; align-items: center;
     padding: 10px 18px; gap: 12px;
@@ -239,7 +259,6 @@
   .pay-btn:hover { background: #d1f5e4; }
   .pay-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-  /* ── MODAL ───────────────────────────────────────────────── */
   .modal-backdrop {
     position: fixed; inset: 0;
     background: rgba(20,18,40,.45);
@@ -290,7 +309,6 @@
     cursor: pointer; font-family: 'DM Sans', sans-serif;
   }
 
-  /* ── TOAST ──────────────────────────────────────────────── */
   #toast {
     position: fixed; bottom: 30px; left: 50%;
     transform: translateX(-50%) translateY(100px);
@@ -302,7 +320,6 @@
   }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-  /* ── SKELETON ───────────────────────────────────────────── */
   .skeleton {
     background: linear-gradient(90deg, #ece9e4 25%, #f5f3f0 50%, #ece9e4 75%);
     background-size: 200% 100%;
@@ -317,17 +334,14 @@
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <h1>Our <span>Expenses</span></h1>
 </div>
 
-<!-- JUNE COUNTDOWN -->
 <div class="june-banner">
   🗓 <strong id="june-days">—</strong> days left
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
   <!-- ── USER 1 ── -->
@@ -339,9 +353,12 @@
           <div class="profile-name" id="name-user1">—</div>
         </div>
       </div>
-      <div class="exp-total-line">
-        <span style="font-weight:400">Total Expenses</span>
-        <span id="exptotal-user1">₹0</span>
+      <div class="balance-row">
+        <div>
+          <div class="balance-label">Balance</div>
+          <div class="balance-amount" id="balance-user1">₹0</div>
+        </div>
+        <button class="set-balance-btn" onclick="openSetBalance('user1')">✏ Set Balance</button>
       </div>
     </div>
 
@@ -385,9 +402,12 @@
           <div class="profile-name" id="name-user2">—</div>
         </div>
       </div>
-      <div class="exp-total-line">
-        <span style="font-weight:400">Total Expenses</span>
-        <span id="exptotal-user2">₹0</span>
+      <div class="balance-row">
+        <div>
+          <div class="balance-label">Balance</div>
+          <div class="balance-amount" id="balance-user2">₹0</div>
+        </div>
+        <button class="set-balance-btn" onclick="openSetBalance('user2')">✏ Set Balance</button>
       </div>
     </div>
 
@@ -424,7 +444,6 @@
 
 </div>
 
-<!-- MODAL -->
 <div class="modal-backdrop" id="modal-backdrop" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="modal-box">
     <h3 id="modal-title">Add</h3>
@@ -436,19 +455,15 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────
 const API = "";
 
-// ── STATE ───────────────────────────────────────────────
-let modalType = null;   // 'expense' | 'receivable' | 'debt'
+let modalType = null;
 let modalUser = null;
 let users     = {};
 
-// ── HELPERS ─────────────────────────────────────────────
 const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
 const fmtDate = (iso) => {
@@ -479,25 +494,19 @@ function esc(s) {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-// ── JUNE COUNTDOWN ──────────────────────────────────────
 function updateJuneCountdown() {
-  const now   = new Date();
-  const year  = now.getFullYear();
-  let june1   = new Date(year, 5, 1);
+  const now  = new Date();
+  const year = now.getFullYear();
+  let june1  = new Date(year, 5, 1);
   if (now >= june1) june1 = new Date(year + 1, 5, 1);
-  const days  = Math.ceil((june1 - now) / 86400000);
-  document.getElementById("june-days").textContent = days;
+  document.getElementById("june-days").textContent = Math.ceil((june1 - now) / 86400000);
 }
 updateJuneCountdown();
 setInterval(updateJuneCountdown, 60000);
 
-// ── RENDER EXPENSES ─────────────────────────────────────
 function renderExpenses(userId, list) {
   const el = document.getElementById(`expenses-${userId}`);
-  if (!list.length) {
-    el.innerHTML = `<p class="empty-msg">No expenses yet ✨</p>`;
-    return;
-  }
+  if (!list.length) { el.innerHTML = `<p class="empty-msg">No expenses yet ✨</p>`; return; }
   el.innerHTML = list.map(e => `
     <div class="exp-row" id="exp-${e.id}">
       <div class="exp-dot"></div>
@@ -511,13 +520,9 @@ function renderExpenses(userId, list) {
   `).join("");
 }
 
-// ── RENDER RECEIVABLES ───────────────────────────────────
 function renderReceivables(userId, list) {
   const el = document.getElementById(`receivables-${userId}`);
-  if (!list.length) {
-    el.innerHTML = `<p class="empty-msg">Nothing to collect 🙌</p>`;
-    return;
-  }
+  if (!list.length) { el.innerHTML = `<p class="empty-msg">Nothing to collect 🙌</p>`; return; }
   el.innerHTML = list.map(r => `
     <div class="recv-row" id="recv-${r.id}">
       <div class="recv-info">
@@ -531,13 +536,9 @@ function renderReceivables(userId, list) {
   `).join("");
 }
 
-// ── RENDER DEBTS ────────────────────────────────────────
 function renderDebts(userId, list) {
   const el = document.getElementById(`debts-${userId}`);
-  if (!list.length) {
-    el.innerHTML = `<p class="empty-msg">No pending debts 🎉</p>`;
-    return;
-  }
+  if (!list.length) { el.innerHTML = `<p class="empty-msg">No pending debts 🎉</p>`; return; }
   el.innerHTML = list.map(d => `
     <div class="debt-row" id="debt-${d.id}">
       <div class="debt-info">
@@ -551,13 +552,15 @@ function renderDebts(userId, list) {
   `).join("");
 }
 
-// ── UPDATE EXPENSE TOTAL ─────────────────────────────────
-function updateExpTotal(userId, expenses) {
+function updateBalanceUI(userId, expenses) {
   const expTotal = expenses.reduce((s, e) => s + e.amount, 0);
-  document.getElementById(`exptotal-${userId}`).textContent = fmt(expTotal);
+  const starting = users[userId]?.balance || 0;
+  const balance  = starting - expTotal;
+  const balEl = document.getElementById(`balance-${userId}`);
+  balEl.textContent = fmt(balance);
+  balEl.classList.toggle("negative", balance < 0);
 }
 
-// ── LOAD ALL ────────────────────────────────────────────
 async function loadAll() {
   try {
     const usersArr = await api("/api/users");
@@ -581,7 +584,7 @@ async function loadAll() {
       renderExpenses(uid, exps);
       renderReceivables(uid, recvs);
       renderDebts(uid, debts);
-      updateExpTotal(uid, exps);
+      updateBalanceUI(uid, exps);
     }));
   } catch (err) {
     console.error(err);
@@ -589,7 +592,25 @@ async function loadAll() {
   }
 }
 
-// ── OPEN ADD MODAL ──────────────────────────────────────
+function openSetBalance(userId) {
+  modalType = "balance";
+  modalUser = userId;
+  const accent = userId === "user1" ? "var(--u1)" : "var(--u2)";
+  document.getElementById("modal-box").style.setProperty("--modal-accent", accent);
+  const current = users[userId]?.balance || 0;
+  document.getElementById("modal-title").textContent = "Set Balance";
+  document.getElementById("modal-body").innerHTML = `
+    <div class="form-group">
+      <label>Current Balance (₹)</label>
+      <input id="f-balance" type="number" placeholder="e.g. 5000" min="0" value="${current || ""}" />
+      <p class="form-hint">Expenses will be deducted from this amount automatically.</p>
+    </div>
+  `;
+  document.getElementById("modal-submit").textContent = "Save";
+  document.getElementById("modal-backdrop").style.display = "flex";
+  setTimeout(() => document.getElementById("f-balance")?.focus(), 100);
+}
+
 function openModal(type, userId) {
   modalType = type;
   modalUser = userId;
@@ -652,19 +673,29 @@ function openModal(type, userId) {
   setTimeout(() => document.querySelector("#modal-body input")?.focus(), 100);
 }
 
-// ── CLOSE MODAL ─────────────────────────────────────────
 function closeModal(e) {
   if (e && e.target !== document.getElementById("modal-backdrop")) return;
   document.getElementById("modal-backdrop").style.display = "none";
 }
 
-// ── SUBMIT MODAL ────────────────────────────────────────
 async function submitModal() {
   const btn = document.getElementById("modal-submit");
   btn.disabled = true;
 
   try {
-    if (modalType === "expense") {
+    if (modalType === "balance") {
+      const amount = parseFloat(document.getElementById("f-balance")?.value);
+      if (isNaN(amount) || amount < 0) throw new Error("Please enter a valid amount");
+      await api(`/api/users/${modalUser}`, {
+        method: "PATCH",
+        body: JSON.stringify({ balance: amount }),
+      });
+      users[modalUser].balance = amount;
+      toast("✅ Balance saved!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
+
+    } else if (modalType === "expense") {
       const title  = document.getElementById("f-title")?.value.trim();
       const amount = parseFloat(document.getElementById("f-amount")?.value);
       const date   = document.getElementById("f-date")?.value;
@@ -715,7 +746,6 @@ async function submitModal() {
   }
 }
 
-// ── DELETE EXPENSE ──────────────────────────────────────
 async function deleteExpense(id, userId) {
   if (!confirm("Delete this expense?")) return;
   try {
@@ -727,7 +757,6 @@ async function deleteExpense(id, userId) {
   }
 }
 
-// ── DELETE RECEIVABLE ────────────────────────────────────
 async function deleteReceivable(id, userId) {
   if (!confirm("Remove this entry?")) return;
   try {
@@ -739,7 +768,6 @@ async function deleteReceivable(id, userId) {
   }
 }
 
-// ── MARK DEBT PAID ──────────────────────────────────────
 async function markPaid(debtId, userId) {
   const btn = document.getElementById(`pay-${debtId}`);
   if (btn) btn.disabled = true;
@@ -753,7 +781,6 @@ async function markPaid(debtId, userId) {
   }
 }
 
-// ── UTILS ───────────────────────────────────────────────
 function todayISO() {
   return new Date().toISOString().split("T")[0];
 }
@@ -762,7 +789,6 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") document.getElementById("modal-backdrop").style.display = "none";
 });
 
-// ── INIT ────────────────────────────────────────────────
 loadAll();
 </script>
 </body>
