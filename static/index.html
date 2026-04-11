@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>💑 Nmmmmll</title>
+<title>💑 Our Expenses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
@@ -531,7 +531,7 @@ function renderReceivables(userId, list) {
         <div class="recv-note">${fmtDate(r.created_at)}</div>
       </div>
       <div class="recv-amt">${fmt(r.amount)}</div>
-      <button class="del-btn" title="Delete" onclick="deleteReceivable('${r.id}','${userId}')">✕</button>
+      <button class="del-btn" title="Collected" onclick="deleteReceivable('${r.id}','${userId}')">✕</button>
     </div>
   `).join("");
 }
@@ -552,10 +552,8 @@ function renderDebts(userId, list) {
   `).join("");
 }
 
-function updateBalanceUI(userId, expenses) {
-  const expTotal = expenses.reduce((s, e) => s + e.amount, 0);
-  const starting = users[userId]?.balance || 0;
-  const balance  = starting - expTotal;
+function updateBalanceUI(userId) {
+  const balance = users[userId]?.balance || 0;
   const balEl = document.getElementById(`balance-${userId}`);
   balEl.textContent = fmt(balance);
   balEl.classList.toggle("negative", balance < 0);
@@ -584,7 +582,7 @@ async function loadAll() {
       renderExpenses(uid, exps);
       renderReceivables(uid, recvs);
       renderDebts(uid, debts);
-      updateBalanceUI(uid, exps);
+      updateBalanceUI(uid);
     }));
   } catch (err) {
     console.error(err);
@@ -603,7 +601,7 @@ function openSetBalance(userId) {
     <div class="form-group">
       <label>Current Balance (₹)</label>
       <input id="f-balance" type="number" placeholder="e.g. 5000" min="0" value="${current || ""}" />
-      <p class="form-hint">Expenses will be deducted from this amount automatically.</p>
+      <p class="form-hint">This sets your balance directly in Supabase.</p>
     </div>
   `;
   document.getElementById("modal-submit").textContent = "Save";
@@ -758,10 +756,10 @@ async function deleteExpense(id, userId) {
 }
 
 async function deleteReceivable(id, userId) {
-  if (!confirm("Remove this entry?")) return;
+  if (!confirm("Mark as collected?")) return;
   try {
     await api(`/api/receivables/${id}`, { method: "DELETE" });
-    toast("🗑 Removed");
+    toast("💰 Collected & added to balance!");
     await loadAll();
   } catch (err) {
     toast("⚠️ " + err.message);
@@ -773,7 +771,7 @@ async function markPaid(debtId, userId) {
   if (btn) btn.disabled = true;
   try {
     await api(`/api/debts/${debtId}/pay`, { method: "POST" });
-    toast("🎉 Marked paid & added to expenses!");
+    toast("🎉 Marked paid & deducted from balance!");
     await loadAll();
   } catch (err) {
     toast("⚠️ " + err.message);
