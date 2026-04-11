@@ -76,12 +76,17 @@ def add_expense():
         "created_at": body.get("created_at", datetime.now(timezone.utc).isoformat()),
     }
     res = supabase.table("expenses").insert(payload).execute()
+    adjust_balance(body["user_id"], -amount)
     return jsonify(res.data[0]), 201
 
 
 @app.route("/api/expenses/<expense_id>", methods=["DELETE"])
 def delete_expense(expense_id):
+    exp_res = supabase.table("expenses").select("*").eq("id", expense_id).single().execute()
+    exp = exp_res.data
     supabase.table("expenses").delete().eq("id", expense_id).execute()
+    if exp:
+        adjust_balance(exp["user_id"], +exp["amount"])
     return jsonify({"message": "Deleted"}), 200
 
 
@@ -198,7 +203,7 @@ def mark_debt_paid(debt_id):
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     exp_res = supabase.table("expenses").insert(expense_payload).execute()
-
+    adjust_balance(debt["user_id"], -debt["amount"])
     return jsonify({"message": "Debt paid", "expense": exp_res.data[0]}), 200
 
 
