@@ -31,7 +31,7 @@ def get_users():
 @app.route("/api/users/<user_id>", methods=["PATCH"])
 def update_user(user_id):
     body = request.get_json()
-    allowed = {k: v for k, v in body.items() if k in ("name", "avatar_url")}
+    allowed = {k: v for k, v in body.items() if k in ("name", "avatar_url", "balance")}
     res = supabase.table("users").update(allowed).eq("id", user_id).execute()
     return jsonify(res.data)
 
