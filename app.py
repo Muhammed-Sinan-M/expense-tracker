@@ -45,6 +45,19 @@ def update_user(user_id):
     return jsonify(res.data)
 
 
+@app.route("/api/users/<user_id>/add-balance", methods=["POST"])
+def add_to_balance(user_id):
+    body = request.get_json()
+    try:
+        amount = float(body.get("amount", 0))
+        if amount <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a positive number"}), 400
+    new_balance = adjust_balance(user_id, +amount)
+    return jsonify({"message": "Balance updated", "new_balance": new_balance}), 200
+
+
 # ─── EXPENSES ─────────────────────────────────────────────────────────────────
 @app.route("/api/expenses", methods=["GET"])
 def get_expenses():
@@ -127,6 +140,35 @@ def add_receivable():
     }
     res = supabase.table("receivables").insert(payload).execute()
     return jsonify(res.data[0]), 201
+
+
+@app.route("/api/receivables/<receivable_id>/collect", methods=["POST"])
+def collect_receivable(receivable_id):
+    body = request.get_json()
+    recv_res = supabase.table("receivables").select("*").eq("id", receivable_id).single().execute()
+    recv = recv_res.data
+
+    if not recv:
+        return jsonify({"error": "Receivable not found"}), 404
+
+    try:
+        collected = float(body.get("amount", recv["amount"]))
+        if collected <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "Amount must be a positive number"}), 400
+
+    original = float(recv["amount"])
+
+    if collected >= original:
+        supabase.table("receivables").delete().eq("id", receivable_id).execute()
+        new_balance = adjust_balance(recv["user_id"], +original)
+        return jsonify({"message": "Fully collected", "collected": original, "remaining": 0, "new_balance": new_balance}), 200
+    else:
+        remaining = round(original - collected, 2)
+        supabase.table("receivables").update({"amount": remaining}).eq("id", receivable_id).execute()
+        new_balance = adjust_balance(recv["user_id"], +collected)
+        return jsonify({"message": "Partially collected", "collected": collected, "remaining": remaining, "new_balance": new_balance}), 200
 
 
 @app.route("/api/receivables/<receivable_id>", methods=["DELETE"])
