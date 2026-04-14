@@ -142,21 +142,41 @@
   }
   .balance-amount.negative { color: var(--danger); }
 
+  .balance-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
   .set-balance-btn {
     background: none;
     border: 1.5px solid var(--accent);
     color: var(--accent);
     border-radius: 99px;
-    padding: 6px 14px;
-    font-size: .75rem;
+    padding: 5px 13px;
+    font-size: .73rem;
     font-weight: 600;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
     white-space: nowrap;
     transition: background .15s, color .15s;
-    flex-shrink: 0;
   }
   .set-balance-btn:hover { background: var(--accent); color: #fff; }
+
+  .add-balance-btn {
+    background: var(--success);
+    border: none;
+    color: #fff;
+    border-radius: 99px;
+    padding: 5px 13px;
+    font-size: .73rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: opacity .15s;
+  }
+  .add-balance-btn:hover { opacity: .85; }
 
   .block {
     background: var(--card);
@@ -237,6 +257,14 @@
   .recv-person { font-weight: 600; font-size: .88rem; }
   .recv-note { font-size: .7rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .recv-amt { font-weight: 600; font-size: .93rem; color: var(--teal); white-space: nowrap; }
+  .collect-btn {
+    background: var(--teal-lt); color: var(--teal);
+    border: none; border-radius: 99px;
+    padding: 5px 11px; font-size: .73rem; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  }
+  .collect-btn:hover { background: #c2ede9; }
 
   .debt-row {
     display: flex; align-items: center;
@@ -358,7 +386,10 @@
           <div class="balance-label">Balance</div>
           <div class="balance-amount" id="balance-user1">₹0</div>
         </div>
-        <button class="set-balance-btn" onclick="openSetBalance('user1')">✏ Set Balance</button>
+        <div class="balance-btns">
+          <button class="set-balance-btn" onclick="openSetBalance('user1')">✏ Set Balance</button>
+          <button class="add-balance-btn" onclick="openAddBalance('user1')">＋ Add Balance</button>
+        </div>
       </div>
     </div>
 
@@ -407,7 +438,10 @@
           <div class="balance-label">Balance</div>
           <div class="balance-amount" id="balance-user2">₹0</div>
         </div>
-        <button class="set-balance-btn" onclick="openSetBalance('user2')">✏ Set Balance</button>
+        <div class="balance-btns">
+          <button class="set-balance-btn" onclick="openSetBalance('user2')">✏ Set Balance</button>
+          <button class="add-balance-btn" onclick="openAddBalance('user2')">＋ Add Balance</button>
+        </div>
       </div>
     </div>
 
@@ -460,9 +494,11 @@
 <script>
 const API = "";
 
-let modalType = null;
-let modalUser = null;
-let users     = {};
+let modalType     = null;
+let modalUser     = null;
+let modalRecvId   = null;
+let modalRecvMax  = 0;
+let users         = {};
 
 const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
@@ -531,7 +567,7 @@ function renderReceivables(userId, list) {
         <div class="recv-note">${fmtDate(r.created_at)}</div>
       </div>
       <div class="recv-amt">${fmt(r.amount)}</div>
-      <button class="del-btn" title="Collected" onclick="deleteReceivable('${r.id}','${userId}')">✕</button>
+      <button class="collect-btn" onclick="openCollectModal('${r.id}','${userId}',${r.amount},'${esc(r.person)}')">Collect</button>
     </div>
   `).join("");
 }
@@ -601,12 +637,51 @@ function openSetBalance(userId) {
     <div class="form-group">
       <label>Current Balance (₹)</label>
       <input id="f-balance" type="number" placeholder="e.g. 5000" min="0" value="${current || ""}" />
-      <p class="form-hint">This sets your balance directly in Supabase.</p>
+      <p class="form-hint">This overwrites and sets your balance directly.</p>
     </div>
   `;
   document.getElementById("modal-submit").textContent = "Save";
   document.getElementById("modal-backdrop").style.display = "flex";
   setTimeout(() => document.getElementById("f-balance")?.focus(), 100);
+}
+
+function openAddBalance(userId) {
+  modalType = "add-balance";
+  modalUser = userId;
+  document.getElementById("modal-box").style.setProperty("--modal-accent", "var(--success)");
+  document.getElementById("modal-title").textContent = "Add to Balance";
+  document.getElementById("modal-body").innerHTML = `
+    <div class="form-group">
+      <label>Amount to Add (₹)</label>
+      <input id="f-add-amount" type="number" placeholder="e.g. 500" min="1" />
+      <p class="form-hint">This amount will be added on top of your current balance.</p>
+    </div>
+  `;
+  document.getElementById("modal-submit").textContent = "Add";
+  document.getElementById("modal-backdrop").style.display = "flex";
+  setTimeout(() => document.getElementById("f-add-amount")?.focus(), 100);
+}
+
+function openCollectModal(recvId, userId, fullAmount, person) {
+  modalType    = "collect";
+  modalUser    = userId;
+  modalRecvId  = recvId;
+  modalRecvMax = fullAmount;
+  document.getElementById("modal-box").style.setProperty("--modal-accent", "var(--teal)");
+  document.getElementById("modal-title").textContent = `Collect from ${person}`;
+  document.getElementById("modal-body").innerHTML = `
+    <div class="form-group">
+      <label>Amount Received (₹)</label>
+      <input id="f-collect-amount" type="number" placeholder="0" min="1" max="${fullAmount}" value="${fullAmount}" />
+      <p class="form-hint">Total pending: ${fmt(fullAmount)}. Change the amount if you only received part of it — the rest stays in the list.</p>
+    </div>
+  `;
+  document.getElementById("modal-submit").textContent = "Collect";
+  document.getElementById("modal-backdrop").style.display = "flex";
+  setTimeout(() => {
+    const inp = document.getElementById("f-collect-amount");
+    if (inp) { inp.focus(); inp.select(); }
+  }, 100);
 }
 
 function openModal(type, userId) {
@@ -693,6 +768,32 @@ async function submitModal() {
       document.getElementById("modal-backdrop").style.display = "none";
       await loadAll();
 
+    } else if (modalType === "add-balance") {
+      const amount = parseFloat(document.getElementById("f-add-amount")?.value);
+      if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
+      await api(`/api/users/${modalUser}/add-balance`, {
+        method: "POST",
+        body: JSON.stringify({ amount }),
+      });
+      toast("✅ Balance updated!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
+
+    } else if (modalType === "collect") {
+      const amount = parseFloat(document.getElementById("f-collect-amount")?.value);
+      if (!amount || amount <= 0) throw new Error("Please enter a valid amount");
+      if (amount > modalRecvMax) throw new Error(`Cannot collect more than ${fmt(modalRecvMax)}`);
+      const res = await api(`/api/receivables/${modalRecvId}/collect`, {
+        method: "POST",
+        body: JSON.stringify({ amount }),
+      });
+      const remaining = res.remaining || 0;
+      toast(remaining > 0
+        ? `💰 Collected ${fmt(amount)} — ${fmt(remaining)} still pending`
+        : "💰 Fully collected & added to balance!");
+      document.getElementById("modal-backdrop").style.display = "none";
+      await loadAll();
+
     } else if (modalType === "expense") {
       const title  = document.getElementById("f-title")?.value.trim();
       const amount = parseFloat(document.getElementById("f-amount")?.value);
@@ -749,17 +850,6 @@ async function deleteExpense(id, userId) {
   try {
     await api(`/api/expenses/${id}`, { method: "DELETE" });
     toast("🗑 Deleted");
-    await loadAll();
-  } catch (err) {
-    toast("⚠️ " + err.message);
-  }
-}
-
-async function deleteReceivable(id, userId) {
-  if (!confirm("Mark as collected?")) return;
-  try {
-    await api(`/api/receivables/${id}`, { method: "DELETE" });
-    toast("💰 Collected & added to balance!");
     await loadAll();
   } catch (err) {
     toast("⚠️ " + err.message);
