@@ -3,35 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>💑 Nmmmlll</title>
+<title>💑 Our Expenses</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-<!--
-  ══════════════════════════════════════════════════════════
-  SUPABASE — run this SQL once in your project's SQL editor
-  ══════════════════════════════════════════════════════════
-
-  create table kiss_bank (
-    id   text primary key default 'shared',
-    kisses integer not null default 0,
-    updated_at timestamptz not null default now()
-  );
-  insert into kiss_bank (id, kisses) values ('shared', 0)
-    on conflict (id) do nothing;
-
-  create table kiss_debts (
-    id         uuid primary key default gen_random_uuid(),
-    label      text not null,
-    kiss_cost  integer not null,
-    status     text not null default 'pending',
-    created_at timestamptz not null default now()
-  );
--->
-
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg:        #f4f1ee;
     --card:      #ffffff;
@@ -56,7 +32,6 @@
     --u2: var(--pink);
     --u2-lt: var(--pink-lt);
   }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
@@ -65,7 +40,6 @@
     padding: 0 0 80px;
     overflow-x: hidden;
   }
-
   /* ── Topbar ── */
   .topbar {
     background: var(--card);
@@ -81,7 +55,6 @@
   }
   .topbar h1 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--text); }
   .topbar h1 span { color: var(--pink); }
-
   .kiss-topbar-btn {
     background: var(--kiss-lt);
     border: 1.5px solid #ffb3c8;
@@ -98,7 +71,6 @@
     transition: background .15s;
   }
   .kiss-topbar-btn:hover { background: #ffdce8; }
-
   .june-banner {
     background: linear-gradient(135deg, #fff8f0 0%, #fde8f1 100%);
     border-bottom: 1px solid #f0dde8;
@@ -113,7 +85,6 @@
     color: var(--pink);
     margin: 0 3px;
   }
-
   .main {
     max-width: 900px;
     margin: 0 auto;
@@ -125,9 +96,7 @@
   @media (min-width: 700px) {
     .main { grid-template-columns: 1fr 1fr; gap: 28px; }
   }
-
   .user-section { display: flex; flex-direction: column; gap: 14px; }
-
   .profile-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -137,7 +106,6 @@
   }
   .user-section[data-user="user1"] .profile-card { --accent: var(--u1); }
   .user-section[data-user="user2"] .profile-card { --accent: var(--u2); }
-
   .profile-top {
     display: flex;
     align-items: center;
@@ -157,7 +125,6 @@
     font-weight: 700;
     color: var(--text);
   }
-
   .balance-row {
     display: flex;
     align-items: center;
@@ -168,7 +135,6 @@
   }
   .user-section[data-user="user1"] .balance-row { --accent-lt: var(--u1-lt); }
   .user-section[data-user="user2"] .balance-row { --accent-lt: var(--u2-lt); }
-
   .balance-label {
     font-size: .68rem;
     font-weight: 700;
@@ -185,7 +151,6 @@
     line-height: 1;
   }
   .balance-amount.negative { color: var(--danger); }
-
   .balance-btns {
     display: flex;
     flex-direction: column;
@@ -206,7 +171,6 @@
     transition: background .15s, color .15s;
   }
   .set-balance-btn:hover { background: var(--accent); color: #fff; }
-
   .add-balance-btn {
     background: var(--success);
     border: none;
@@ -221,7 +185,6 @@
     transition: opacity .15s;
   }
   .add-balance-btn:hover { opacity: .85; }
-
   .block {
     background: var(--card);
     border-radius: var(--radius);
@@ -257,7 +220,6 @@
   .add-btn:hover { filter: brightness(.92); }
   .user-section[data-user="user1"] .add-btn { --accent: var(--u1); --accent-lt: var(--u1-lt); }
   .user-section[data-user="user2"] .add-btn { --accent: var(--u2); --accent-lt: var(--u2-lt); }
-
   .item-list { padding: 4px 0; min-height: 40px; }
   .empty-msg {
     text-align: center;
@@ -265,14 +227,12 @@
     font-size: .82rem;
     padding: 16px 10px;
   }
-
-  /* ── Day group (collapsed past day) ── */
+  /* ── Day group ── */
   .day-group {
     border-bottom: 1px solid #f5f3f0;
     animation: fadeIn .22s ease;
   }
   .day-group:last-child { border-bottom: none; }
-
   .day-header {
     display: flex;
     align-items: center;
@@ -283,7 +243,6 @@
     transition: background .12s;
   }
   .day-header:hover { background: #faf9f7; }
-
   .day-label {
     font-size: .78rem;
     font-weight: 700;
@@ -308,10 +267,8 @@
     display: inline-block;
   }
   .day-group.open .day-chevron { transform: rotate(180deg); }
-
   .day-items { display: none; }
   .day-group.open .day-items { display: block; }
-
   /* ── Expense row ── */
   .exp-row {
     display: flex; align-items: center;
@@ -336,7 +293,6 @@
     transition: color .15s; line-height: 1;
   }
   .del-btn:hover { color: var(--danger); }
-
   /* ── Receivable row ── */
   .recv-row {
     display: flex; align-items: center;
@@ -357,7 +313,6 @@
     font-family: 'DM Sans', sans-serif; white-space: nowrap;
   }
   .collect-btn:hover { background: #c2ede9; }
-
   /* ── Debt row ── */
   .debt-row {
     display: flex; align-items: center;
@@ -379,7 +334,6 @@
   }
   .pay-btn:hover { background: #d1f5e4; }
   .pay-btn:disabled { opacity: .5; cursor: not-allowed; }
-
   /* ── Modal ── */
   .modal-backdrop {
     position: fixed; inset: 0;
@@ -430,7 +384,6 @@
     padding: 12px 18px; font-size: .95rem; font-weight: 600;
     cursor: pointer; font-family: 'DM Sans', sans-serif;
   }
-
   /* ── Toast ── */
   #toast {
     position: fixed; bottom: 30px; left: 50%;
@@ -442,7 +395,6 @@
     opacity: 0; pointer-events: none; white-space: nowrap;
   }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
   /* ── Skeleton ── */
   .skeleton {
     background: linear-gradient(90deg, #ece9e4 25%, #f5f3f0 50%, #ece9e4 75%);
@@ -450,7 +402,6 @@
     animation: shimmer 1.4s infinite;
     border-radius: 8px; height: 13px; margin: 8px 18px;
   }
-
   /* ── Kiss Bank Side Panel ── */
   .kiss-overlay {
     position: fixed; inset: 0;
@@ -465,7 +416,6 @@
     opacity: 1;
     pointer-events: all;
   }
-
   .kiss-panel {
     position: fixed;
     top: 0; right: 0; bottom: 0;
@@ -480,8 +430,6 @@
     border-radius: var(--radius) 0 0 var(--radius);
   }
   .kiss-panel.open { transform: translateX(0); }
-
-  /* Swipe tab on the right edge */
   .kiss-tab {
     position: fixed;
     right: 0;
@@ -503,7 +451,6 @@
   }
   .kiss-tab:hover { transform: translateY(-50%) translateX(-3px); }
   .kiss-tab.hidden { display: none; }
-
   .kiss-panel-header {
     padding: 22px 20px 16px;
     border-bottom: 1px solid var(--border);
@@ -528,7 +475,6 @@
     transition: background .15s;
   }
   .kiss-close-btn:hover { background: #ebe8e4; }
-
   .kiss-panel-body {
     flex: 1;
     overflow-y: auto;
@@ -537,7 +483,6 @@
     flex-direction: column;
     gap: 22px;
   }
-
   /* Kiss counter */
   .kiss-counter-card {
     background: linear-gradient(135deg, #fff0f4, #fde8f1);
@@ -588,7 +533,6 @@
   }
   .kiss-adj-btn:hover { background: var(--kiss); color: #fff; }
   .kiss-adj-btn:active { transform: scale(.93); }
-
   .kiss-set-btn {
     background: none;
     border: 1.5px solid #ffb3c8;
@@ -602,83 +546,77 @@
     transition: background .15s;
   }
   .kiss-set-btn:hover { background: #ffdce8; }
-
-  /* Kiss debts section */
+  /* Notices section */
   .kiss-section-title {
     font-size: .72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .07em;
     color: var(--muted);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    margin-bottom: 10px;
   }
-  .kiss-add-debt-btn {
-    background: var(--kiss-lt);
-    color: var(--kiss);
+  .notice-compose {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .notice-textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-size: .88rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    resize: none;
+    height: 72px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .notice-textarea:focus { border-color: var(--kiss); }
+  .notice-post-btn {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #ff4b7b, #e05c8a);
+    color: #fff;
     border: none;
     border-radius: 99px;
-    padding: 4px 12px;
-    font-size: .73rem;
+    padding: 7px 18px;
+    font-size: .78rem;
     font-weight: 600;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    transition: filter .15s;
+    transition: opacity .15s;
   }
-  .kiss-add-debt-btn:hover { filter: brightness(.93); }
-
-  .kiss-debt-row {
+  .notice-post-btn:hover { opacity: .88; }
+  .notice-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
-    padding: 10px 14px;
+    padding: 11px 13px;
     background: #faf9f7;
     border-radius: var(--radius-sm);
     border: 1px solid #f0ece7;
     margin-bottom: 8px;
     animation: fadeIn .2s ease;
   }
-  .kiss-debt-info { flex: 1; min-width: 0; }
-  .kiss-debt-label { font-weight: 600; font-size: .88rem; }
-  .kiss-debt-cost {
-    font-size: .72rem;
-    color: var(--kiss);
-    font-weight: 700;
-    margin-top: 2px;
-  }
-  .kiss-pay-btn {
-    background: var(--kiss-lt);
-    color: var(--kiss);
-    border: 1px solid #ffb3c8;
-    border-radius: 99px;
-    padding: 4px 11px;
-    font-size: .72rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    white-space: nowrap;
-    transition: background .15s;
-  }
-  .kiss-pay-btn:hover { background: #ffdce8; }
-  .kiss-del-btn {
+  .notice-msg { flex: 1; font-size: .88rem; line-height: 1.5; word-break: break-word; }
+  .notice-time { font-size: .68rem; color: var(--muted); margin-top: 3px; }
+  .notice-del-btn {
     background: none; border: none; cursor: pointer;
-    color: #ccc; font-size: .9rem; padding: 2px;
+    color: #ccc; font-size: .88rem; padding: 2px; flex-shrink: 0;
     transition: color .15s;
   }
-  .kiss-del-btn:hover { color: var(--danger); }
-
+  .notice-del-btn:hover { color: var(--danger); }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
 </style>
 </head>
 <body>
-
 <!-- ── Kiss Bank Swipe Tab ── -->
 <div class="kiss-tab" id="kiss-tab" onclick="openKissPanel()">💋 Kiss Bank</div>
-
 <!-- ── Kiss Bank Overlay + Panel ── -->
 <div class="kiss-overlay" id="kiss-overlay" onclick="closeKissPanel()"></div>
 <div class="kiss-panel" id="kiss-panel">
@@ -687,45 +625,39 @@
     <button class="kiss-close-btn" onclick="closeKissPanel()">✕</button>
   </div>
   <div class="kiss-panel-body">
-
     <!-- Counter -->
     <div class="kiss-counter-card">
       <div class="kiss-count-label">Shared Kiss Balance</div>
       <div class="kiss-count-display" id="kiss-count">—</div>
       <div class="kiss-count-sub">kisses saved up 💕</div>
       <div class="kiss-counter-btns">
-        <button class="kiss-adj-btn" onclick="adjustKisses(-1)" title="Remove one kiss">−</button>
+        <button class="kiss-adj-btn" onclick="adjustKisses(-0.5)" title="Remove half a kiss">−</button>
         <button class="kiss-set-btn" onclick="openSetKisses()">Set</button>
-        <button class="kiss-adj-btn" onclick="adjustKisses(+1)" title="Add one kiss">＋</button>
+        <button class="kiss-adj-btn" onclick="adjustKisses(+0.5)" title="Add half a kiss">＋</button>
       </div>
     </div>
-
-    <!-- Kiss Debts -->
+    <!-- Notices -->
     <div>
-      <div class="kiss-section-title">
-        <span>Kiss Debts</span>
-        <button class="kiss-add-debt-btn" onclick="openAddKissDebt()">+ Add Debt</button>
+      <div class="kiss-section-title">📝 Notices</div>
+      <div class="notice-compose">
+        <textarea class="notice-textarea" id="notice-input" placeholder="Write a message or note…"></textarea>
+        <button class="notice-post-btn" onclick="addNotice()">Post</button>
       </div>
-      <div id="kiss-debts-list">
+      <div id="notices-list">
         <div class="skeleton"></div>
       </div>
     </div>
-
   </div>
 </div>
-
 <!-- ── Main UI ── -->
 <div class="topbar">
   <h1>Our <span>Expenses</span></h1>
   <button class="kiss-topbar-btn" onclick="openKissPanel()">💋 <span id="kiss-count-badge">—</span></button>
 </div>
-
 <div class="june-banner">
   🗓 <strong id="june-days">—</strong> days left
 </div>
-
 <div class="main">
-
   <!-- ── USER 1 ── -->
   <div class="user-section" data-user="user1">
     <div class="profile-card">
@@ -746,7 +678,6 @@
         </div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💳 Expenses</span>
@@ -756,7 +687,6 @@
         <div class="skeleton"></div><div class="skeleton"></div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💰 Money to Get</span>
@@ -766,7 +696,6 @@
         <div class="skeleton"></div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💸 Debts</span>
@@ -777,7 +706,6 @@
       </div>
     </div>
   </div>
-
   <!-- ── USER 2 ── -->
   <div class="user-section" data-user="user2">
     <div class="profile-card">
@@ -798,7 +726,6 @@
         </div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💳 Expenses</span>
@@ -808,7 +735,6 @@
         <div class="skeleton"></div><div class="skeleton"></div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💰 Money to Get</span>
@@ -818,7 +744,6 @@
         <div class="skeleton"></div>
       </div>
     </div>
-
     <div class="block">
       <div class="block-header">
         <span class="block-title">💸 Debts</span>
@@ -829,10 +754,7 @@
       </div>
     </div>
   </div>
-
 </div>
-
-<!-- ── Expense Detail Modal (for tapping day row) ── -->
 <div class="modal-backdrop" id="modal-backdrop" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="modal-box">
     <h3 id="modal-title">Add</h3>
@@ -843,7 +765,6 @@
     </div>
   </div>
 </div>
-
 <div id="toast"></div>
 
 <script>
@@ -856,15 +777,12 @@ let modalRecvMax = 0;
 let users        = {};
 let kissCount    = 0;
 
-// ── Helpers ──────────────────────────────────────────────
 const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
 const fmtDate = (iso) => {
   const d = new Date(iso);
   return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 };
-
-const todayStr = () => new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
 const toast = (msg, ms = 2400) => {
   const el = document.getElementById("toast");
@@ -939,7 +857,6 @@ function renderExpenses(userId, list) {
   const el = document.getElementById(`expenses-${userId}`);
   if (!list.length) { el.innerHTML = `<p class="empty-msg">No expenses yet ✨</p>`; return; }
 
-  // Group by date key
   const groups = {};
   const order  = [];
   list.forEach(e => {
@@ -954,7 +871,6 @@ function renderExpenses(userId, list) {
     const dayTotal = items.reduce((s, e) => s + parseFloat(e.amount), 0);
 
     if (isToday(key)) {
-      // Today: show full detail without collapse
       html += `<div class="day-group open">`;
       html += `<div class="day-header" onclick="toggleDay(this)">
                  <span class="day-label">Today</span>
@@ -967,7 +883,6 @@ function renderExpenses(userId, list) {
       items.forEach(e => { html += expenseItemHTML(e); });
       html += `</div></div>`;
     } else {
-      // Past day: collapsed by default, tap to expand
       html += `<div class="day-group">`;
       html += `<div class="day-header" onclick="toggleDay(this)">
                  <span class="day-label">${esc(friendlyDayLabel(key))}</span>
@@ -990,7 +905,6 @@ function toggleDay(headerEl) {
   group.classList.toggle("open");
 }
 
-// ── Receivables + Debts rendering ────────────────────────
 function renderReceivables(userId, list) {
   const el = document.getElementById(`receivables-${userId}`);
   if (!list.length) { el.innerHTML = `<p class="empty-msg">Nothing to collect 🙌</p>`; return; }
@@ -1030,7 +944,6 @@ function updateBalanceUI(userId) {
   balEl.classList.toggle("negative", balance < 0);
 }
 
-// ── Load All ─────────────────────────────────────────────
 async function loadAll() {
   try {
     const usersArr = await api("/api/users");
@@ -1068,6 +981,7 @@ function openKissPanel() {
   document.getElementById("kiss-overlay").classList.add("open");
   document.getElementById("kiss-tab").classList.add("hidden");
   loadKissBank();
+  loadNotices();
 }
 
 function closeKissPanel() {
@@ -1080,30 +994,61 @@ async function loadKissBank() {
   try {
     const data = await api("/api/kiss-bank");
     kissCount = data.kisses;
-    document.getElementById("kiss-count").textContent = kissCount;
-    document.getElementById("kiss-count-badge").textContent = kissCount + " 💋";
-    renderKissDebts(data.debts || []);
+    const display = Number.isInteger(kissCount) ? kissCount : kissCount.toFixed(1);
+    document.getElementById("kiss-count").textContent = display;
+    document.getElementById("kiss-count-badge").textContent = display + " 💋";
   } catch (err) {
     toast("⚠️ Could not load kiss bank");
   }
 }
 
-function renderKissDebts(debts) {
-  const el = document.getElementById("kiss-debts-list");
-  if (!debts.length) {
-    el.innerHTML = `<p class="empty-msg" style="padding:10px 0">No kiss debts 🎉</p>`;
+async function loadNotices() {
+  try {
+    const list = await api("/api/notices");
+    renderNotices(list);
+  } catch (err) {
+    toast("⚠️ Could not load notices");
+  }
+}
+
+function renderNotices(list) {
+  const el = document.getElementById("notices-list");
+  if (!list.length) {
+    el.innerHTML = `<p class="empty-msg" style="padding:10px 0">No notices yet 📭</p>`;
     return;
   }
-  el.innerHTML = debts.map(d => `
-    <div class="kiss-debt-row" id="kd-${d.id}">
-      <div class="kiss-debt-info">
-        <div class="kiss-debt-label">${esc(d.label)}</div>
-        <div class="kiss-debt-cost">${d.kiss_cost} kiss${d.kiss_cost !== 1 ? "es" : ""}</div>
+  el.innerHTML = list.map(n => `
+    <div class="notice-row" id="notice-${n.id}">
+      <div class="notice-msg">
+        <div>${esc(n.message)}</div>
+        <div class="notice-time">${fmtDate(n.created_at)}</div>
       </div>
-      <button class="kiss-pay-btn" onclick="payKissDebt('${d.id}',${d.kiss_cost})">Pay 💋</button>
-      <button class="kiss-del-btn" onclick="deleteKissDebt('${d.id}')">✕</button>
+      <button class="notice-del-btn" onclick="deleteNotice('${n.id}')">✕</button>
     </div>
   `).join("");
+}
+
+async function addNotice() {
+  const inp = document.getElementById("notice-input");
+  const message = inp.value.trim();
+  if (!message) { toast("⚠️ Write something first"); return; }
+  try {
+    await api("/api/notices", { method: "POST", body: JSON.stringify({ message }) });
+    inp.value = "";
+    toast("📝 Notice posted!");
+    loadNotices();
+  } catch (err) {
+    toast("⚠️ " + err.message);
+  }
+}
+
+async function deleteNotice(id) {
+  try {
+    await api(`/api/notices/${id}`, { method: "DELETE" });
+    loadNotices();
+  } catch (err) {
+    toast("⚠️ " + err.message);
+  }
 }
 
 async function adjustKisses(delta) {
@@ -1113,35 +1058,9 @@ async function adjustKisses(delta) {
       body: JSON.stringify({ delta }),
     });
     kissCount = data.kisses;
-    document.getElementById("kiss-count").textContent = kissCount;
-    document.getElementById("kiss-count-badge").textContent = kissCount + " 💋";
-  } catch (err) {
-    toast("⚠️ " + err.message);
-  }
-}
-
-async function payKissDebt(debtId, cost) {
-  if (kissCount < cost) {
-    toast(`⚠️ Not enough kisses! Need ${cost}, have ${kissCount}`);
-    return;
-  }
-  try {
-    const data = await api(`/api/kiss-debts/${debtId}/pay`, { method: "POST" });
-    kissCount = data.kisses_remaining;
-    document.getElementById("kiss-count").textContent = kissCount;
-    document.getElementById("kiss-count-badge").textContent = kissCount + " 💋";
-    toast("💋 Kiss debt paid!");
-    loadKissBank();
-  } catch (err) {
-    toast("⚠️ " + err.message);
-  }
-}
-
-async function deleteKissDebt(debtId) {
-  try {
-    await api(`/api/kiss-debts/${debtId}`, { method: "DELETE" });
-    toast("🗑 Removed");
-    loadKissBank();
+    const display = Number.isInteger(kissCount) ? kissCount : kissCount.toFixed(1);
+    document.getElementById("kiss-count").textContent = display;
+    document.getElementById("kiss-count-badge").textContent = display + " 💋";
   } catch (err) {
     toast("⚠️ " + err.message);
   }
@@ -1150,12 +1069,12 @@ async function deleteKissDebt(debtId) {
 function openSetKisses() {
   modalType = "set-kisses";
   document.getElementById("modal-box").style.setProperty("--modal-accent", "var(--kiss)");
-  document.getElementById("modal-title").textContent = "Set Kiss Count";
+  document.getElementById("modal-title").textContent = "Set Kiss Balance";
   document.getElementById("modal-body").innerHTML = `
     <div class="form-group">
       <label>Number of Kisses</label>
-      <input id="f-kisses" type="number" min="0" placeholder="0" value="${kissCount}" />
-      <p class="form-hint">This sets the shared kiss balance directly.</p>
+      <input id="f-kisses" type="number" min="0" step="0.5" placeholder="0" value="${kissCount}" />
+      <p class="form-hint">Decimals allowed — e.g. 2.5. Sets the shared balance directly.</p>
     </div>
   `;
   document.getElementById("modal-submit").textContent = "Save";
@@ -1163,27 +1082,7 @@ function openSetKisses() {
   setTimeout(() => { const i = document.getElementById("f-kisses"); if(i){i.focus();i.select();} }, 100);
 }
 
-function openAddKissDebt() {
-  modalType = "add-kiss-debt";
-  document.getElementById("modal-box").style.setProperty("--modal-accent", "var(--kiss)");
-  document.getElementById("modal-title").textContent = "Add Kiss Debt";
-  document.getElementById("modal-body").innerHTML = `
-    <div class="form-group">
-      <label>What is owed?</label>
-      <input id="f-kiss-label" type="text" placeholder="e.g. Movie date, Foot massage…" autocomplete="off" />
-    </div>
-    <div class="form-group">
-      <label>Kiss Cost</label>
-      <input id="f-kiss-cost" type="number" placeholder="1" min="1" value="1" />
-      <p class="form-hint">How many kisses is this worth?</p>
-    </div>
-  `;
-  document.getElementById("modal-submit").textContent = "Add Debt";
-  document.getElementById("modal-backdrop").style.display = "flex";
-  setTimeout(() => document.getElementById("f-kiss-label")?.focus(), 100);
-}
-
-// ── Swipe gesture to open kiss panel ────────────────────
+// ── Swipe gesture ────────────────────────────────────────
 let touchStartX = 0;
 document.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
 document.addEventListener("touchend", e => {
@@ -1391,30 +1290,18 @@ async function submitModal() {
       await loadAll();
 
     } else if (modalType === "set-kisses") {
-      const kisses = parseInt(document.getElementById("f-kisses")?.value);
+      const kisses = parseFloat(document.getElementById("f-kisses")?.value);
       if (isNaN(kisses) || kisses < 0) throw new Error("Please enter a valid number");
       await api("/api/kiss-bank/set", {
         method: "POST",
         body: JSON.stringify({ kisses }),
       });
       kissCount = kisses;
-      document.getElementById("kiss-count").textContent = kissCount;
-      document.getElementById("kiss-count-badge").textContent = kissCount + " 💋";
-      toast("Kiss count saved!");
+      const display = Number.isInteger(kissCount) ? kissCount : kissCount.toFixed(1);
+      document.getElementById("kiss-count").textContent = display;
+      document.getElementById("kiss-count-badge").textContent = display + " 💋";
+      toast("Kiss balance saved!");
       document.getElementById("modal-backdrop").style.display = "none";
-
-    } else if (modalType === "add-kiss-debt") {
-      const label    = document.getElementById("f-kiss-label")?.value.trim();
-      const kiss_cost = parseInt(document.getElementById("f-kiss-cost")?.value);
-      if (!label)                       throw new Error("Please enter a description");
-      if (!kiss_cost || kiss_cost <= 0) throw new Error("Please enter a valid kiss cost");
-      await api("/api/kiss-debts", {
-        method: "POST",
-        body: JSON.stringify({ label, kiss_cost }),
-      });
-      toast("Kiss debt added!");
-      document.getElementById("modal-backdrop").style.display = "none";
-      loadKissBank();
 
     } else {
       const person = document.getElementById("f-person")?.value.trim();
