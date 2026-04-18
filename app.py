@@ -14,6 +14,8 @@ SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY: str = os.environ.get("SUPABASE_SERVICE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+KISS_BANK_ID = "shared"
+
 
 def adjust_balance(user_id, delta):
     user_res = supabase.table("users").select("balance").eq("id", user_id).single().execute()
@@ -22,6 +24,24 @@ def adjust_balance(user_id, delta):
     new_balance = round(current + delta, 2)
     supabase.table("users").update({"balance": new_balance}).eq("id", user_id).execute()
     return new_balance
+
+
+def get_kiss_count():
+    res = supabase.table("kiss_bank").select("kisses").eq("id", KISS_BANK_ID).single().execute()
+    if res.data:
+        return int(res.data.get("kisses", 0))
+    supabase.table("kiss_bank").insert({"id": KISS_BANK_ID, "kisses": 0}).execute()
+    return 0
+
+
+def set_kiss_count(new_count):
+    new_count = max(0, int(new_count))
+    supabase.table("kiss_bank").upsert({
+        "id": KISS_BANK_ID,
+        "kisses": new_count,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }).execute()
+    return new_count
 
 
 # ─── Serve frontend ────────────────────────────────────────────────────────────
@@ -181,7 +201,6 @@ def delete_receivable(receivable_id):
 
     supabase.table("receivables").delete().eq("id", receivable_id).execute()
     new_balance = adjust_balance(recv["user_id"], +recv["amount"])
-
     return jsonify({"message": "Collected", "balance_added": recv["amount"], "new_balance": new_balance}), 200
 
 
@@ -277,6 +296,94 @@ def get_summary():
         totals[uid]["receivable_total"] += row["amount"]
 
     return jsonify(totals)
+
+
+# ─── KISS BANK ────────────────────────────────────────────────────────────────
+@app.route("/api/kiss-bank", methods=["GET"])
+def get_kiss_bank():
+    kisses = get_kiss_count()
+    debts_res = supabase.table("kiss_debts").select("*").eq("status", "pending").order("created_at", desc=True).execute()
+    return jsonify({"kisses": kisses, "debts": debts_res.data})
+
+
+@app.route("/api/kiss-bank/set", methods=["POST"])
+def set_kisses():
+    body = request.get_json()
+    try:
+        count = int(body.get("kisses", 0))
+        if count < 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "kisses must be a non-negative integer"}), 400
+    new_count = set_kiss_count(count)
+    return jsonify({"kisses": new_count}), 200
+
+
+@app.route("/api/kiss-bank/adjust", methods=["POST"])
+def adjust_kisses():
+    body = request.get_json()
+    try:
+        delta = int(body.get("delta", 0))
+    except (ValueError, TypeError):
+        return jsonify({"error": "delta must be an integer"}), 400
+    current = get_kiss_count()
+    new_count = set_kiss_count(current + delta)
+    return jsonify({"kisses": new_count}), 200
+
+
+# ─── KISS DEBTS ───────────────────────────────────────────────────────────────
+@app.route("/api/kiss-debts", methods=["GET"])
+def get_kiss_debts():
+    res = supabase.table("kiss_debts").select("*").eq("status", "pending").order("created_at", desc=True).execute()
+    return jsonify(res.data)
+
+
+@app.route("/api/kiss-debts", methods=["POST"])
+def add_kiss_debt():
+    body = request.get_json()
+    if not body.get("label") or not body.get("kiss_cost"):
+        return jsonify({"error": "label and kiss_cost are required"}), 400
+    try:
+        kiss_cost = int(body["kiss_cost"])
+        if kiss_cost <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        return jsonify({"error": "kiss_cost must be a positive integer"}), 400
+
+    payload = {
+        "label": str(body["label"]).strip(),
+        "kiss_cost": kiss_cost,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    res = supabase.table("kiss_debts").insert(payload).execute()
+    return jsonify(res.data[0]), 201
+
+
+@app.route("/api/kiss-debts/<debt_id>/pay", methods=["POST"])
+def pay_kiss_debt(debt_id):
+    debt_res = supabase.table("kiss_debts").select("*").eq("id", debt_id).single().execute()
+    debt = debt_res.data
+
+    if not debt:
+        return jsonify({"error": "Kiss debt not found"}), 404
+    if debt["status"] == "paid":
+        return jsonify({"error": "Already paid"}), 400
+
+    kiss_cost = int(debt["kiss_cost"])
+    current = get_kiss_count()
+    if current < kiss_cost:
+        return jsonify({"error": f"Not enough kisses! Need {kiss_cost}, have {current}"}), 400
+
+    supabase.table("kiss_debts").update({"status": "paid"}).eq("id", debt_id).execute()
+    new_count = set_kiss_count(current - kiss_cost)
+    return jsonify({"message": "Kiss debt paid", "kisses_remaining": new_count}), 200
+
+
+@app.route("/api/kiss-debts/<debt_id>", methods=["DELETE"])
+def delete_kiss_debt(debt_id):
+    supabase.table("kiss_debts").delete().eq("id", debt_id).execute()
+    return jsonify({"message": "Deleted"}), 200
 
 
 if __name__ == "__main__":
